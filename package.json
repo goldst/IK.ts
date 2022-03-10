@@ -1,66 +1,68 @@
 {
-  "name": "ik.ts",
-  "version": "1.3.4",
-  "description": "TypeScript Inverse Kinematics Library",
-  "main": "build/ik.js",
-  "repository": "goldst/IK.ts",
-  "jsnext:main": "build/ik.js",
-  "module": "build/ik.js",
-  "files": [
-    "package.json",
-    "LICENSE",
-    "README.md",
-    "build/ik.js",
-    "build/ik.js.LICENSE.txt",
-    "src",
-    "examples/js",
-    "examples/fonts"
-  ],
-  "directories": {
-    "example": "examples"
-  },
-  "eslintConfig": {
-    "extends": "mdcs"
-  },
-  "scripts": {
-    "build:dev": "webpack --mode development",
-    "build": "webpack --mode production",
-    "dev": "webpack watch --mode development",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "ik.ts",
-    "inverese kinematics",
-    "FABRIK",
-    "typescript",
-    "javascript",
-    "fullik",
-    "fik",
-    "fik.js",
-    "ui"
-  ],
-  "author": "Leonard Goldstein, based on Fullik by lo-th",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/goldst/IK.ts/issues"
-  },
-  "homepage": "https://goldst.dev/IK.ts",
-  "devDependencies": {
-    "@types/three": "^0.138.0",
-    "@typescript-eslint/eslint-plugin": "^5.14.0",
-    "@typescript-eslint/parser": "^5.14.0",
-    "eslint": "^8.10.0",
-    "eslint-config-mdcs": "latest",
-    "google-closure-compiler": "latest",
-    "ts-loader": "^9.2.7",
-    "typescript": "^4.6.2",
-    "webpack": "^5.70.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.4"
-  },
-  "dependencies": {
-    "three": "^0.138.3"
-  }
+    "name": "ik.ts",
+    "version": "1.3.5",
+    "description": "TypeScript Inverse Kinematics Library",
+    "main": "build/ik.js",
+    "repository": "goldst/IK.ts",
+    "jsnext:main": "build/ik.js",
+    "module": "build/ik.js",
+    "files": [
+        "package.json",
+        "LICENSE",
+        "README.md",
+        "build/ik.js",
+        "build/ik.js.LICENSE.txt",
+        "src",
+        "examples/js",
+        "examples/fonts"
+    ],
+    "directories": {
+        "example": "examples"
+    },
+    "eslintConfig": {
+        "extends": "mdcs"
+    },
+    "scripts": {
+        "build:dev": "webpack --mode development",
+        "build": "webpack --mode production",
+        "dev": "webpack watch --mode development",
+        "build:module": "tsc",
+        "lint": "eslint src",
+        "lint:fix": "eslint src --fix",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "ik.ts",
+        "inverese kinematics",
+        "FABRIK",
+        "typescript",
+        "javascript",
+        "fullik",
+        "fik",
+        "fik.js",
+        "ui"
+    ],
+    "author": "Leonard Goldstein, based on Fullik by lo-th",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/goldst/IK.ts/issues"
+    },
+    "homepage": "https://goldst.dev/IK.ts",
+    "devDependencies": {
+        "@types/three": "^0.138.0",
+        "@typescript-eslint/eslint-plugin": "^5.14.0",
+        "@typescript-eslint/parser": "^5.14.0",
+        "eslint": "^8.10.0",
+        "eslint-config-mdcs": "latest",
+        "google-closure-compiler": "latest",
+        "ts-loader": "^9.2.7",
+        "typescript": "^4.6.2",
+        "webpack": "^5.70.0",
+        "webpack-cli": "^4.9.2",
+        "webpack-dev-server": "^4.7.4"
+    },
+    "dependencies": {
+        "three": "^0.138.3"
+    },
+    "types": "dist/"
 }

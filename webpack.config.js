@@ -1,25 +1,25 @@
-  const path = require('path');
+const path = require('path');
 
-  module.exports = {
+module.exports = {
     entry: './src/IK.ts',
 
     devtool: 'inline-source-map',
     module: {
-      rules: [
-        {
-          test: /\.tsx?$/,
-          use: 'ts-loader',
-          exclude: /node_modules/,
-        },
-      ],
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+        ],
     },
     resolve: {
-      extensions: [ '.tsx', '.ts', '.js' ],
+        extensions: [ '.tsx', '.ts', '.js' ],
     },
     output: {
-      filename: 'IK.js',
-      path: path.resolve(__dirname, 'build'),
-      library: 'IK',
-      libraryTarget: 'window'
+        filename: 'IK-browser.js',
+        path: path.resolve(__dirname, 'build'),
+        library: 'IK',
+        libraryTarget: 'window'
     },
-  };
+};

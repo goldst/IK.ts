@@ -12,11 +12,11 @@ export class Structure3D {
     meshChains: THREE.Mesh[][];
     targets: V3[];
     numChains: number;
-    scene: THREE.Scene;
+    scene?: THREE.Scene;
     tmpMtx: M3;
     isWithMesh: boolean;
 
-    constructor( scene: THREE.Scene ) {
+    constructor( scene?: THREE.Scene ) {
 
         this.fixedBaseMode = true;
 
@@ -25,7 +25,7 @@ export class Structure3D {
         this.targets = [];
         this.numChains = 0;
 
-        this.scene = scene || null;
+        this.scene = scene;
 
         this.tmpMtx = new M3();
 
@@ -155,7 +155,7 @@ export class Structure3D {
 
     }
 
-    add( chain: Chain3D, target: V3, meshBone: boolean ) {
+    add( chain: Chain3D, target: V3, meshBone?: boolean ) {
 
         this.chains.push( chain );
 
@@ -203,7 +203,7 @@ export class Structure3D {
 
     }
 
-    connectChain( Chain: Chain3D, chainNumber: number, boneNumber: number, point: string, target: V3, meshBone: THREE.Mesh, color: number ) {
+    connectChain( Chain: Chain3D, chainNumber: number, boneNumber: number, point: string, target: V3, meshBone: THREE.Mesh, color?: number ) {
 
         const c = chainNumber;
         const n = boneNumber;
@@ -361,7 +361,7 @@ export class Structure3D {
         const b = new THREE.Mesh( g, m );
         b.add( axeThree );
         //b.add(bw);
-        this.scene.add( b );
+        this.scene?.add( b );
 
         b.castShadow = true;
         b.receiveShadow = true;
@@ -406,7 +406,7 @@ export class Structure3D {
             while ( j -- ) {
 
                 b = this.meshChains[ i ][ j ];
-                this.scene.remove( b );
+                this.scene?.remove( b );
                 b.geometry.dispose();
                 if(b.material instanceof THREE.Material) {
                     b.material.dispose();

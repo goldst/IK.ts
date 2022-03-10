@@ -13,13 +13,13 @@ Installation:
 
 You can either add the library using html:
 ```html
-<script src="node_modules/ik.ts/build/IK.js"></script>
+<script src="node_modules/ik.ts/build/IK-browser.js"></script>
 ```
 and then access the classes using the global object `IK`.
 
 Or you can include the unbundled source as a module:
 ```ts
-import * as IK from 'ik.ts/src/IK';
+import * as IK from 'ik.ts/build/IK';
 ```
 
 Documentation is planned, for now just have a look at `index.html` and the `demos` folder for usage examples.
