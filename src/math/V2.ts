@@ -1,4 +1,6 @@
-export class V2 {
+import { Vector } from './Vector';
+
+export class V2 implements Vector<2> {
 
     static isVector2 = true;
     x: number;
@@ -9,6 +11,13 @@ export class V2 {
         this.x = x || 0;
         this.y = y || 0;
 
+    }
+
+    abs() {
+        return new V2(
+            this.x < 0 ? - this.x : this.x,
+            this.y < 0 ? - this.y : this.y
+        );
     }
 
 
@@ -30,6 +39,13 @@ export class V2 {
 
         const dx = this.x - v.x, dy = this.y - v.y;
         return dx * dx + dy * dy;
+
+    }
+
+
+    multiply( s: number ) {
+
+        return new V2( this.x * s, this.y * s);
 
     }
 
@@ -162,6 +178,14 @@ export class V2 {
 
     }
 
+    zero() {
+
+        this.x = 0;
+        this.y = 0;
+        return this;
+
+    }
+
     rotate( angle: number ) {
 
         const cos = Math.cos( angle );
@@ -171,6 +195,24 @@ export class V2 {
         this.x = x;
         this.y = y;
         return this;
+
+    }
+
+
+    projectOnVector( vector: V2 ) {
+
+        const scalar = vector.dot( this ) / vector.lengthSq();
+        return this.copy( vector ).multiplyScalar( scalar );
+
+    }
+
+    projectOnPlane(planeNormal: V2) {
+
+        const v1 = new V2();
+
+        v1.copy( this ).projectOnVector( planeNormal.normalised() );
+
+        return this.min( v1 ).normalize();
 
     }
 

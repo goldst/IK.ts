@@ -2,9 +2,11 @@ import { MAX_VALUE, BaseboneConstraintType, ConnectionType, JointType } from '..
 import { _Math } from '../math/Math';
 import { V2 } from '../math/V2';
 import { Bone2D } from './Bone2D';
+import { Chain } from './Chain';
+import { Joint2D } from './Joint2D';
 import { Tools } from './Tools';
 
-export class Chain2D {
+export class Chain2D implements Chain<Bone2D, V2, Joint2D, BaseboneConstraintType, 2> {
     static isChain2D = true;
     tmpTarget: V2;
     bones: Bone2D[];
@@ -26,11 +28,10 @@ export class Chain2D {
     currentSolveDistance: number;
     connectedChainNumber: number;
     connectedBoneNumber: number;
-    color: number;
     embeddedTarget: V2;
     useEmbeddedTarget: boolean;
 
-    constructor( color?: number ) {
+    constructor() {
         this.tmpTarget = new V2();
 
         this.bones = [];
@@ -60,8 +61,6 @@ export class Chain2D {
         this.currentSolveDistance = MAX_VALUE;
         this.connectedChainNumber = - 1;
         this.connectedBoneNumber = - 1;
-
-        this.color = color || 0xFFFFFF;
 
         this.embeddedTarget = new V2();
         this.useEmbeddedTarget = false;
@@ -102,8 +101,6 @@ export class Chain2D {
         c.connectedBoneNumber = this.connectedBoneNumber;
         c.baseboneConstraintType = this.baseboneConstraintType;
 
-        c.color = this.color;
-
         c.embeddedTarget = this.embeddedTarget.clone();
         c.useEmbeddedTarget = this.useEmbeddedTarget;
 
@@ -125,8 +122,6 @@ export class Chain2D {
     }
 
     addBone( bone: Bone2D ) {
-
-        if ( bone.color === null ) bone.setColor( this.color );
 
         // Add the new bone to the end of the ArrayList of bones
         this.bones.push( bone );
@@ -164,7 +159,7 @@ export class Chain2D {
 
     }
 
-    addConsecutiveBone( directionUV: V2 | Bone2D, length: number, clockwiseDegs: number, anticlockwiseDegs: number, color?: number ) {
+    addConsecutiveBone( directionUV: V2 | Bone2D, length: number, clockwiseDegs: number, anticlockwiseDegs: number ) {
 
         if ( this.numBones === 0 ) {
 
@@ -194,8 +189,6 @@ export class Chain2D {
 
         } else if ( directionUV instanceof V2 ) {
 
-            color = color || this.color;
-
             // Validate the direction unit vector - throws an IllegalArgumentException if it has a magnitude of zero
             _Math.validateDirectionUV( directionUV );
 
@@ -206,7 +199,7 @@ export class Chain2D {
             const prevBoneEnd = this.bones[ this.numBones - 1 ].end;
 
             // Add a bone to the end of this IK chain
-            this.addBone( new Bone2D( prevBoneEnd, undefined, directionUV.normalised(), length, clockwiseDegs, anticlockwiseDegs, color ) );
+            this.addBone( new Bone2D( prevBoneEnd, undefined, directionUV.normalised(), length, clockwiseDegs, anticlockwiseDegs ) );
 
 
         }
@@ -285,14 +278,6 @@ export class Chain2D {
     // -------------------------------
     //      SET
     // -------------------------------
-
-    setColor( color: number ) {
-
-        this.color = color;
-        let i = this.numBones;
-        while ( i -- ) this.bones[ i ].setColor( this.color );
-
-    }
 
     setBaseboneRelativeConstraintUV( constraintUV?: V2 ) {
 

@@ -15,12 +15,4 @@ export { Bone2D } from './core/Bone2D';
 export { Chain2D } from './core/Chain2D';
 export { Structure2D } from './core/Structure2D';
 
-export { IKSolver } from './solver/IKSolver';
-export { HISolver } from './solver/HISolver';
-
 export * from './constants';
-
-export * as THREE from 'three';
-export { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-export { TransformControls } from 'three/examples/jsm/controls/TransformControls';
-

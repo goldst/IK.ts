@@ -1,8 +1,9 @@
 import { ConnectionType, JointType } from '../constants';
 import { Joint2D } from './Joint2D';
 import { V2 } from '../math/V2';
+import { Bone } from './Bone';
 
-export class Bone2D {
+export class Bone2D implements Bone<V2, Joint2D, 2> {
     isBone2D = true;
     start: V2;
     end: V2;
@@ -10,10 +11,9 @@ export class Bone2D {
     joint: Joint2D;
     globalConstraintUV = new V2( 1, 0 );
     boneConnectionPoint = ConnectionType.END;
-    color?: number;
     name: string;
 
-    constructor( Start: V2, End?: V2, directionUV?: V2, length?: number, clockwiseDegs?: number, anticlockwiseDegs?: number, color?: number ) {
+    constructor( Start: V2, End?: V2, directionUV?: V2, length?: number, clockwiseDegs?: number, anticlockwiseDegs?: number ) {
 
         this.start = new V2();
         this.end = new V2();
@@ -21,8 +21,6 @@ export class Bone2D {
 
         this.joint = new Joint2D( clockwiseDegs, anticlockwiseDegs );
 
-
-        this.color = color;
         this.name = '';
 
         // init
@@ -50,7 +48,6 @@ export class Bone2D {
         b.globalConstraintUV = this.globalConstraintUV;
         b.boneConnectionPoint = this.boneConnectionPoint;
         b.joint = this.joint.clone();
-        b.color = this.color;
         b.name = this.name;
         return b;
 
@@ -62,12 +59,6 @@ export class Bone2D {
     setName( name: string ) {
 
         this.name = name;
-
-    }
-
-    setColor( c: number ) {
-
-        this.color = c;
 
     }
 

@@ -4,14 +4,15 @@ import { V3 } from '../math/V3';
 import { M3 } from '../math/M3';
 import { Bone3D } from './Bone3D';
 import { Tools } from './Tools';
+import { Chain } from './Chain';
+import { Joint3D } from './Joint3D';
 
-export class Chain3D {
+export class Chain3D implements Chain<Bone3D, V3, Joint3D, BaseboneConstraintType, 3> {
     static isChain3D = true;
     tmpTarget: V3;
     tmpMtx: M3;
     bones: Bone3D[];
     name: string;
-    color: number;
     solveDistanceThreshold: number;
     minIterationChange: number;
     maxIteration: number;
@@ -34,14 +35,13 @@ export class Chain3D {
     embeddedTarget: V3;
     useEmbeddedTarget: boolean;
 
-    constructor( color?: number ) {
+    constructor() {
 
         this.tmpTarget = new V3();
         this.tmpMtx = new M3();
 
         this.bones = [];
         this.name = '';
-        this.color = color || 0xFFFFFF;
 
         this.solveDistanceThreshold = 1.0;
         this.minIterationChange = 0.01;
@@ -112,8 +112,6 @@ export class Chain3D {
         c.connectedBoneNumber = this.connectedBoneNumber;
         c.baseboneConstraintType = this.baseboneConstraintType;
 
-        c.color = this.color;
-
         c.embeddedTarget = this.embeddedTarget.clone();
         c.useEmbeddedTarget = this.useEmbeddedTarget;
 
@@ -130,8 +128,6 @@ export class Chain3D {
     }
 
     addBone( bone: Bone3D ) {
-
-        bone.setColor( this.color );
 
         // Add the new bone to the end of the ArrayList of bones
         this.bones.push( bone );
@@ -196,7 +192,7 @@ export class Chain3D {
         const hingeRotationAxis = HingeRotationAxis.normalised();
 
         // Create a bone, get the end location of the last bone, which will be used as the start location of the new bone
-        const bone = new Bone3D( this.bones[ this.numBones - 1 ].end, undefined, directionUV, length, this.color );
+        const bone = new Bone3D( this.bones[ this.numBones - 1 ].end, undefined, directionUV, length );
 
         type = type || 'global';
 
@@ -308,14 +304,6 @@ export class Chain3D {
     setBoneConnectionPoint( point: ConnectionType ) {
 
         this.boneConnectionPoint = point;
-
-    }
-
-    setColor( c: number ) {
-
-        this.color = c;
-        let i = this.numBones;
-        while ( i -- ) this.bones[ i ].setColor( this.color );
 
     }
 

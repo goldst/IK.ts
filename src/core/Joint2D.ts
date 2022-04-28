@@ -1,6 +1,7 @@
 import { PI, TORAD, JointType } from '../constants';
+import { Joint } from './Joint';
 
-export class Joint2D {
+export class Joint2D implements Joint<2> {
     isJoint2D: boolean;
     coordinateSystem: JointType;
     min: number;

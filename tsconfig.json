@@ -11,9 +11,7 @@
     "declaration": true
   },
   "exclude": [
-    "demos",
     "webpack.*",
-    "test",
     "build"
   ]
 }

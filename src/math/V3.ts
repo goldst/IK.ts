@@ -1,6 +1,7 @@
 import { M3 } from './M3';
+import { Vector } from './Vector';
 
-export class V3 {
+export class V3 implements Vector<3> {
     static isVector3 = true;
     x: number;
     y: number;
@@ -204,19 +205,6 @@ export class V3 {
 
     }
 
-    /*projectOnPlane_old( planeNormal ) {
-
-        if ( planeNormal.length() <= 0 ){ Tools.error("Plane normal cannot be a zero vector."); return; }
-
-        // Projection of vector b onto plane with normal n is defined as: b - ( b.n / ( |n| squared )) * n
-        // Note: |n| is length or magnitude of the vector n, NOT its (component-wise) absolute value
-        var b = this.normalised();
-        var n = planeNormal.normalised();
-
-        return b.min( n.times( _Math.dotProduct( b, planeNormal ) ) ).normalize();
-
-    }*/
-
     rotate( angle: number, axe: 'X' | 'Y' | 'Z' ) {
 
         const cos = Math.cos( angle );
@@ -259,17 +247,13 @@ export class V3 {
 
     }
 
-    get projectOnPlane() {
+    projectOnPlane(planeNormal: V3) {
 
         const v1 = new V3();
 
-        return ( planeNormal: V3 ) => {
+        v1.copy( this ).projectOnVector( planeNormal.normalised() );
 
-            v1.copy( this ).projectOnVector( planeNormal.normalised() );
-
-            return this.min( v1 ).normalize();
-
-        };
+        return this.min( v1 ).normalize();
 
     }
 

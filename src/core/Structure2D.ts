@@ -1,33 +1,25 @@
 import { UP, ConnectionType, BaseboneConstraintType } from '../constants';
-import { _Math } from '../math/Math';
 import { V2 } from '../math/V2';
-import { Chain2D } from './Chain2D';
-import { Tools } from './Tools';
-import * as THREE from 'three';
 import { Bone2D } from './Bone2D';
+import { Chain2D } from './Chain2D';
+import { Joint2D } from './Joint2D';
+import { Structure } from './Structure';
+import { Tools } from './Tools';
 
-export class Structure2D {
+export class Structure2D implements Structure<Chain2D, V2, Bone2D, Joint2D, BaseboneConstraintType, 2> {
     static isStructure2D = true;
     fixedBaseMode: boolean;
     chains: Chain2D[];
-    meshChains: THREE.Mesh[][];
     targets: V2[];
     numChains: number;
-    scene: THREE.Scene;
-    isWithMesh: boolean;
 
-    constructor( scene: THREE.Scene ) {
+    constructor( ) {
 
         this.fixedBaseMode = true;
 
         this.chains = [];
-        this.meshChains = [];
         this.targets = [];
         this.numChains = 0;
-
-        this.scene = scene || null;
-
-        this.isWithMesh = false;
 
     }
 
@@ -35,8 +27,7 @@ export class Structure2D {
 
         //console.log('up')
 
-        let chain, mesh, bone, target;
-        const tmp = new THREE.Vector3();
+        let chain, target;
         let hostChainNumber;
         let constraintType;
 
@@ -97,23 +88,6 @@ export class Structure2D {
             else console.log( 'embed', chain.solveForEmbeddedTarget() );
 
 
-            // update 3d mesh
-
-            if ( this.isWithMesh ) {
-
-                mesh = this.meshChains[ i ];
-
-                for ( let j = 0; j < chain.numBones; j ++ ) {
-
-                    bone = chain.bones[ j ];
-                    mesh[ j ].position.set( bone.start.x, bone.start.y, 0 );
-                    mesh[ j ].lookAt( tmp.set( bone.end.x, bone.end.y, 0 ) );
-
-                }
-
-            }
-
-
         }
 
     }
@@ -135,8 +109,6 @@ export class Structure2D {
 
     clear() {
 
-        this.clearAllBoneMesh();
-
         let i;
 
         i = this.numChains;
@@ -147,12 +119,11 @@ export class Structure2D {
         }
 
         this.chains = [];
-        this.meshChains = [];
         this.targets = [];
 
     }
 
-    add( chain: Chain2D, target: V2, meshBone?: boolean ) {
+    add( chain: Chain2D, target: V2 ) {
 
         this.chains.push( chain );
         this.numChains ++;
@@ -161,16 +132,12 @@ export class Structure2D {
 
         if ( target ) this.targets.push( target );
 
-
-        if ( meshBone ) this.addChainMeshs( chain );
-
     }
 
     remove( id: number ) {
 
         this.chains[ id ].clear();
         this.chains.splice( id, 1 );
-        this.meshChains.splice( id, 1 );
         this.targets.splice( id, 1 );
         this.numChains --;
 
@@ -194,7 +161,7 @@ export class Structure2D {
 
     }
 
-    connectChain( Chain: Chain2D, chainNumber: number, boneNumber: number, point: string, target: V2, meshBone: THREE.Mesh ) {
+    connectChain( Chain: Chain2D, chainNumber: number, boneNumber: number, point: string ) {
 
         const c = chainNumber;
         const n = boneNumber;
@@ -203,13 +170,13 @@ export class Structure2D {
 
         if ( c > this.numChains ) {
 
-            Tools.error( 'Chain not existe !' ); return;
+            Tools.error( 'Chain does not exist!' ); return;
 
         }
 
         if ( n > this.chains[ c ].numBones ) {
 
-            Tools.error( 'Bone not existe !' ); return;
+            Tools.error( 'Bone does not exist!' ); return;
 
         }
 
@@ -243,122 +210,6 @@ export class Structure2D {
             chain.bones[ i ].end.add( position );
 
         }
-
-        this.add( chain, target, !!meshBone );
-
-    }
-
-    // 3D THREE
-
-    addChainMeshs( chain: Chain2D ) {
-
-        this.isWithMesh = true;
-
-        const meshBone = [];
-
-        const lng = chain.bones.length;
-        for ( let i = 0; i < lng; i ++ ) {
-
-            meshBone.push( this.addBoneMesh( chain.bones[ i ] ) );
-
-        }
-
-        this.meshChains.push( meshBone );
-
-    }
-
-    addBoneMesh( bone: Bone2D ) {
-
-        const size = bone.length;
-        const color = bone.color;
-        //console.log(bone.color)
-        const g = new THREE.CylinderBufferGeometry( 1, 0.5, size, 4 );
-        //g.applyMatrix4( new THREE.Matrix4().makeTranslation( 0, size*0.5, 0 ) );
-        g.applyMatrix4( new THREE.Matrix4().makeRotationX( - _Math.pi90 ) );
-        g.applyMatrix4( new THREE.Matrix4().makeTranslation( 0, 0, size * 0.5 ) );
-        //var m = new THREE.MeshStandardMaterial({ color:color });
-        const m = new THREE.MeshStandardMaterial( { color: color, wireframe: false } );
-        //m.color.setHex( color );
-
-        let extraMesh;
-        //let extraGeo;
-
-        /*var type = bone.getJoint().type;
-        switch(type){
-            case J_BALL :
-                m2.color.setHex(0xFF6600);
-                var angle  = bone.getJoint().mRotorConstraintDegs;
-                if(angle === 180) break;
-                var s = size/4;
-                var r = 2;//
-
-                extraGeo = new THREE.CylinderBufferGeometry ( 0, r, s, 6 );
-                extraGeo.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI*0.5 ) )
-                extraGeo.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, s*0.5 ) );
-                extraMesh = new THREE.Mesh( extraGeo,  m2 );
-            break;
-            case J_GLOBAL_HINGE :
-            var a1 = bone.getJoint().mHingeClockwiseConstraintDegs * _Math.torad;
-            var a2 = bone.getJoint().mHingeAnticlockwiseConstraintDegs * _Math.torad;
-            var r = 2;
-            m2.color.setHex(0xFFFF00);
-            extraGeo = new THREE.CircleGeometry ( r, 12, a1, a1+a2 );
-            extraGeo.applyMatrix4( new THREE.Matrix4().makeRotationX( -Math.PI*0.5 ) );
-            extraMesh = new THREE.Mesh( extraGeo,  m2 );
-            break;
-            case J_LOCAL_HINGE :
-            var r = 2;
-            var a1 = bone.getJoint().mHingeClockwiseConstraintDegs * _Math.torad;
-            var a2 = bone.getJoint().mHingeAnticlockwiseConstraintDegs * _Math.torad;
-            m2.color.setHex(0x00FFFF);
-            extraGeo = new THREE.CircleGeometry ( r, 12, a1, a1+a2 );
-            extraGeo.applyMatrix4( new THREE.Matrix4().makeRotationX( -Math.PI*0.5 ) );
-            extraMesh = new THREE.Mesh( extraGeo,  m2 );
-            break;
-        }*/
-
-
-
-
-        const b = new THREE.Mesh( g, m );
-
-        b.castShadow = true;
-        b.receiveShadow = true;
-
-        this.scene.add( b );
-        if ( extraMesh ) b.add( extraMesh );
-        return b;
-
-    }
-
-    clearAllBoneMesh() {
-
-        if ( ! this.isWithMesh ) return;
-
-        let i, j, b;
-
-        i = this.meshChains.length;
-        while ( i -- ) {
-
-            j = this.meshChains[ i ].length;
-            while ( j -- ) {
-
-                b = this.meshChains[ i ][ j ];
-                this.scene.remove( b );
-                b.geometry.dispose();
-                if(b.material instanceof THREE.Material) {
-                    b.material.dispose();
-                } else {
-                    b.material.forEach(m => m.dispose());
-                }
-
-            }
-
-            this.meshChains[ i ] = [];
-
-        }
-
-        this.meshChains = [];
 
     }
 

@@ -1,7 +1,8 @@
 import { V3 } from '../math/V3';
 import { JointType, PI, TORAD } from '../constants';
+import { Joint } from './Joint';
 
-export class Joint3D {
+export class Joint3D implements Joint<3> {
     static isJoint3D = true;
     rotor: number;
     min: number;
@@ -53,6 +54,20 @@ export class Joint3D {
         a = a < 0 ? 0 : a;
         a = a > 180 ? 180 : a;
         return a;
+
+    }
+
+    set( joint: Joint3D ) {
+
+        this.rotor = joint.rotor;
+        this.min = joint.min;
+        this.max = joint.max;
+
+        this.freeHinge = joint.freeHinge;
+
+        this.rotationAxisUV = joint.rotationAxisUV;
+        this.referenceAxisUV = joint.referenceAxisUV;
+        this.type = joint.type;
 
     }
 
