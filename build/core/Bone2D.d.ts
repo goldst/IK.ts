@@ -9,12 +9,10 @@ export declare class Bone2D {
     joint: Joint2D;
     globalConstraintUV: V2;
     boneConnectionPoint: ConnectionType;
-    color?: number;
     name: string;
-    constructor(Start: V2, End?: V2, directionUV?: V2, length?: number, clockwiseDegs?: number, anticlockwiseDegs?: number, color?: number);
+    constructor(Start: V2, End?: V2, directionUV?: V2, length?: number, clockwiseDegs?: number, anticlockwiseDegs?: number);
     clone(): Bone2D;
     setName(name: string): void;
-    setColor(c: number): void;
     setBoneConnectionPoint(bcp: number): void;
     setStartLocation(v: V2): void;
     setEndLocation(v: V2): void;

@@ -5,13 +5,12 @@ var constants_1 = require("../constants");
 var Joint3D_1 = require("./Joint3D");
 var V3_1 = require("../math/V3");
 var Bone3D = /** @class */ (function () {
-    function Bone3D(startLocation, endLocation, directionUV, length, color) {
+    function Bone3D(startLocation, endLocation, directionUV, length) {
         this.joint = new Joint3D_1.Joint3D();
         this.start = new V3_1.V3();
         this.end = new V3_1.V3();
         this.boneConnectionPoint = constants_1.ConnectionType.END;
         this.length = 0;
-        this.color = color || 0xFFFFFF;
         this.name = '';
         this.init(startLocation, endLocation, directionUV, length);
     }
@@ -32,9 +31,6 @@ var Bone3D = /** @class */ (function () {
         return b;
     };
     // SET
-    Bone3D.prototype.setColor = function (c) {
-        this.color = c;
-    };
     Bone3D.prototype.setBoneConnectionPoint = function (bcp) {
         this.boneConnectionPoint = bcp;
     };

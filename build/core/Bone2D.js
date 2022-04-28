@@ -5,7 +5,7 @@ var constants_1 = require("../constants");
 var Joint2D_1 = require("./Joint2D");
 var V2_1 = require("../math/V2");
 var Bone2D = /** @class */ (function () {
-    function Bone2D(Start, End, directionUV, length, clockwiseDegs, anticlockwiseDegs, color) {
+    function Bone2D(Start, End, directionUV, length, clockwiseDegs, anticlockwiseDegs) {
         this.isBone2D = true;
         this.globalConstraintUV = new V2_1.V2(1, 0);
         this.boneConnectionPoint = constants_1.ConnectionType.END;
@@ -13,7 +13,6 @@ var Bone2D = /** @class */ (function () {
         this.end = new V2_1.V2();
         this.length = length || 0;
         this.joint = new Joint2D_1.Joint2D(clockwiseDegs, anticlockwiseDegs);
-        this.color = color;
         this.name = '';
         // init
         this.setStartLocation(Start);
@@ -32,16 +31,12 @@ var Bone2D = /** @class */ (function () {
         b.globalConstraintUV = this.globalConstraintUV;
         b.boneConnectionPoint = this.boneConnectionPoint;
         b.joint = this.joint.clone();
-        b.color = this.color;
         b.name = this.name;
         return b;
     };
     // SET
     Bone2D.prototype.setName = function (name) {
         this.name = name;
-    };
-    Bone2D.prototype.setColor = function (c) {
-        this.color = c;
     };
     Bone2D.prototype.setBoneConnectionPoint = function (bcp) {
         this.boneConnectionPoint = bcp;

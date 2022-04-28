@@ -7,7 +7,7 @@ var V2_1 = require("../math/V2");
 var Bone2D_1 = require("./Bone2D");
 var Tools_1 = require("./Tools");
 var Chain2D = /** @class */ (function () {
-    function Chain2D(color) {
+    function Chain2D() {
         this.tmpTarget = new V2_1.V2();
         this.bones = [];
         this.name = '';
@@ -28,7 +28,6 @@ var Chain2D = /** @class */ (function () {
         this.currentSolveDistance = constants_1.MAX_VALUE;
         this.connectedChainNumber = -1;
         this.connectedBoneNumber = -1;
-        this.color = color || 0xFFFFFF;
         this.embeddedTarget = new V2_1.V2();
         this.useEmbeddedTarget = false;
     }
@@ -56,7 +55,6 @@ var Chain2D = /** @class */ (function () {
         c.connectedChainNumber = this.connectedChainNumber;
         c.connectedBoneNumber = this.connectedBoneNumber;
         c.baseboneConstraintType = this.baseboneConstraintType;
-        c.color = this.color;
         c.embeddedTarget = this.embeddedTarget.clone();
         c.useEmbeddedTarget = this.useEmbeddedTarget;
         return c;
@@ -68,8 +66,6 @@ var Chain2D = /** @class */ (function () {
         }
     };
     Chain2D.prototype.addBone = function (bone) {
-        if (bone.color === null)
-            bone.setColor(this.color);
         // Add the new bone to the end of the ArrayList of bones
         this.bones.push(bone);
         // If this is the basebone...
@@ -92,7 +88,7 @@ var Chain2D = /** @class */ (function () {
             this.updateChainLength();
         }
     };
-    Chain2D.prototype.addConsecutiveBone = function (directionUV, length, clockwiseDegs, anticlockwiseDegs, color) {
+    Chain2D.prototype.addConsecutiveBone = function (directionUV, length, clockwiseDegs, anticlockwiseDegs) {
         if (this.numBones === 0) {
             Tools_1.Tools.error('Chain is empty ! need first bone');
             return;
@@ -112,7 +108,6 @@ var Chain2D = /** @class */ (function () {
             this.addBone(bone);
         }
         else if (directionUV instanceof V2_1.V2) {
-            color = color || this.color;
             // Validate the direction unit vector - throws an IllegalArgumentException if it has a magnitude of zero
             Math_1._Math.validateDirectionUV(directionUV);
             // Validate the length of the bone - throws an IllegalArgumentException if it is not a positive value
@@ -120,7 +115,7 @@ var Chain2D = /** @class */ (function () {
             // Get the end location of the last bone, which will be used as the start location of the new bone
             var prevBoneEnd = this.bones[this.numBones - 1].end;
             // Add a bone to the end of this IK chain
-            this.addBone(new Bone2D_1.Bone2D(prevBoneEnd, undefined, directionUV.normalised(), length, clockwiseDegs, anticlockwiseDegs, color));
+            this.addBone(new Bone2D_1.Bone2D(prevBoneEnd, undefined, directionUV.normalised(), length, clockwiseDegs, anticlockwiseDegs));
         }
     };
     // -------------------------------
@@ -164,12 +159,6 @@ var Chain2D = /** @class */ (function () {
     // -------------------------------
     //      SET
     // -------------------------------
-    Chain2D.prototype.setColor = function (color) {
-        this.color = color;
-        var i = this.numBones;
-        while (i--)
-            this.bones[i].setColor(this.color);
-    };
     Chain2D.prototype.setBaseboneRelativeConstraintUV = function (constraintUV) {
         if (constraintUV)
             this.baseboneRelativeConstraintUV = constraintUV;

@@ -16,8 +16,8 @@ export declare const _Math: {
     perpendicular: (a: V3, b: V3) => boolean;
     genPerpendicularVectorQuick: (v: V3) => V3;
     genPerpendicularVectorFrisvad: (v: V3) => V3;
-    rotateXDegs: (v: V2 | V3, angle: number) => V2 | V3;
-    rotateYDegs: (v: V2 | V3, angle: number) => V2 | V3;
+    rotateXDegs: (v: V2 | V3, angle: number) => V3 | V2;
+    rotateYDegs: (v: V2 | V3, angle: number) => V3 | V2;
     rotateZDegs: (v: V3, angle: number) => V3;
     withinManhattanDistance: (v1: V3, v2: V3, distance: number) => boolean;
     manhattanDistanceBetween: (v1: V2 | V3, v2: V2 | V3) => number;

@@ -8,7 +8,6 @@ export declare class Chain3D {
     tmpMtx: M3;
     bones: Bone3D[];
     name: string;
-    color: number;
     solveDistanceThreshold: number;
     minIterationChange: number;
     maxIteration: number;
@@ -30,7 +29,7 @@ export declare class Chain3D {
     isFullForward: boolean;
     embeddedTarget: V3;
     useEmbeddedTarget: boolean;
-    constructor(color?: number);
+    constructor();
     clone(): Chain3D;
     clear(): void;
     addBone(bone: Bone3D): void;
@@ -52,7 +51,6 @@ export declare class Chain3D {
     setConnectedBoneNumber(boneNumber: number): void;
     setConnectedChainNumber(chainNumber: number): void;
     setBoneConnectionPoint(point: ConnectionType): void;
-    setColor(c: number): void;
     setBaseboneRelativeConstraintUV(uv?: V3): void;
     setBaseboneRelativeReferenceConstraintUV(uv: V3): void;
     setBaseboneConstraintUV(uv: V3): void;

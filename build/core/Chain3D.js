@@ -8,12 +8,11 @@ var M3_1 = require("../math/M3");
 var Bone3D_1 = require("./Bone3D");
 var Tools_1 = require("./Tools");
 var Chain3D = /** @class */ (function () {
-    function Chain3D(color) {
+    function Chain3D() {
         this.tmpTarget = new V3_1.V3();
         this.tmpMtx = new M3_1.M3();
         this.bones = [];
         this.name = '';
-        this.color = color || 0xFFFFFF;
         this.solveDistanceThreshold = 1.0;
         this.minIterationChange = 0.01;
         this.maxIteration = 20;
@@ -61,7 +60,6 @@ var Chain3D = /** @class */ (function () {
         c.connectedChainNumber = this.connectedChainNumber;
         c.connectedBoneNumber = this.connectedBoneNumber;
         c.baseboneConstraintType = this.baseboneConstraintType;
-        c.color = this.color;
         c.embeddedTarget = this.embeddedTarget.clone();
         c.useEmbeddedTarget = this.useEmbeddedTarget;
         return c;
@@ -73,7 +71,6 @@ var Chain3D = /** @class */ (function () {
         this.numBones = 0;
     };
     Chain3D.prototype.addBone = function (bone) {
-        bone.setColor(this.color);
         // Add the new bone to the end of the ArrayList of bones
         this.bones.push(bone);
         // Increment the number of bones in the chain and update the chain length
@@ -115,7 +112,7 @@ var Chain3D = /** @class */ (function () {
         var directionUV = DirectionUV.normalised();
         var hingeRotationAxis = HingeRotationAxis.normalised();
         // Create a bone, get the end location of the last bone, which will be used as the start location of the new bone
-        var bone = new Bone3D_1.Bone3D(this.bones[this.numBones - 1].end, undefined, directionUV, length, this.color);
+        var bone = new Bone3D_1.Bone3D(this.bones[this.numBones - 1].end, undefined, directionUV, length);
         type = type || 'global';
         // ...set up a joint which we'll apply to that bone.
         bone.joint.setHinge(type === 'global' ? constants_1.JointType.J_GLOBAL : constants_1.JointType.J_LOCAL, hingeRotationAxis, clockwiseDegs, anticlockwiseDegs, hingeReferenceAxis);
@@ -181,12 +178,6 @@ var Chain3D = /** @class */ (function () {
     };
     Chain3D.prototype.setBoneConnectionPoint = function (point) {
         this.boneConnectionPoint = point;
-    };
-    Chain3D.prototype.setColor = function (c) {
-        this.color = c;
-        var i = this.numBones;
-        while (i--)
-            this.bones[i].setColor(this.color);
     };
     Chain3D.prototype.setBaseboneRelativeConstraintUV = function (uv) {
         if (uv)

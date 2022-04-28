@@ -3,22 +3,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Structure3D = void 0;
 var constants_1 = require("../constants");
 var M3_1 = require("../math/M3");
-var THREE = require("three");
-var three_1 = require("three");
+/**
+ * A Structure3D contains one or more Chain3D objects, which we can solve using the FABRIK (Forward And
+ * Backward Reaching Inverse Kinematics) algorithm for specified target locations.
+ * The Structure3D class is merely a convenient holder for a list of Chain3D objects which allows
+ * multiple chains to have their target location updated, as well as solving and drawing the multiple chains
+ * attached to the Structure3D object using one method call per structure.
+ * If you do not intend on attaching multiple Chain3D objects into a complex structure, for example one with
+ * multiple effectors, then you may be better served by creating individual Chain3D objects and using those
+ * objects directly.
+ **/
 var Structure3D = /** @class */ (function () {
-    function Structure3D(scene) {
+    function Structure3D() {
         this.fixedBaseMode = true;
         this.chains = [];
-        this.meshChains = [];
         this.targets = [];
         this.numChains = 0;
-        this.scene = scene;
         this.tmpMtx = new M3_1.M3();
-        this.isWithMesh = false;
     }
     Structure3D.prototype.update = function () {
         var _a;
-        var chain, mesh, bone, target;
+        var chain, target;
         var hostChainNumber;
         var hostBone, constraintType;
         //var i =  this.numChains;
@@ -63,40 +68,25 @@ var Structure3D = /** @class */ (function () {
                 chain.solveForTarget(target);
             else
                 chain.solveForEmbeddedTarget();
-            // update 3d mesh
-            if (this.isWithMesh) {
-                mesh = this.meshChains[i];
-                for (var j = 0; j < chain.numBones; j++) {
-                    bone = chain.bones[j];
-                    console.log(bone.end);
-                    mesh[j].position.set(bone.start.x, bone.start.y, bone.start.z);
-                    mesh[j].lookAt(new THREE.Vector3(bone.end.x, bone.end.y, bone.end.z));
-                }
-            }
         }
     };
     Structure3D.prototype.clear = function () {
-        this.clearAllBoneMesh();
         var i;
         i = this.numChains;
         while (i--) {
             this.remove(i);
         }
         this.chains = [];
-        this.meshChains = [];
         this.targets = [];
     };
-    Structure3D.prototype.add = function (chain, target, meshBone) {
+    Structure3D.prototype.add = function (chain, target) {
         this.chains.push(chain);
         this.targets.push(target);
         this.numChains++;
-        if (meshBone)
-            this.addChainMeshs(chain);
     };
     Structure3D.prototype.remove = function (id) {
         this.chains[id].clear();
         this.chains.splice(id, 1);
-        this.meshChains.splice(id, 1);
         this.targets.splice(id, 1);
         this.numChains--;
     };
@@ -115,7 +105,7 @@ var Structure3D = /** @class */ (function () {
     Structure3D.prototype.getChain = function (id) {
         return this.chains[id];
     };
-    Structure3D.prototype.connectChain = function (Chain, chainNumber, boneNumber, point, target, meshBone, color) {
+    Structure3D.prototype.connectChain = function (Chain, chainNumber, boneNumber, point, target) {
         var c = chainNumber;
         var n = boneNumber;
         if (chainNumber > this.numChains)
@@ -124,8 +114,6 @@ var Structure3D = /** @class */ (function () {
             return;
         // Make a copy of the provided chain so any changes made to the original do not affect this chain
         var chain = Chain.clone(); //new Fullik.Chain( newChain );
-        if (color !== undefined)
-            chain.setColor(color);
         // Connect the copy of the provided chain to the specified chain and bone in this structure
         //chain.connectToStructure( this, chainNumber, boneNumber );
         chain.setBoneConnectionPoint(point === 'end' ? constants_1.ConnectionType.END : constants_1.ConnectionType.START);
@@ -144,137 +132,7 @@ var Structure3D = /** @class */ (function () {
             chain.bones[i].start.add(position);
             chain.bones[i].end.add(position);
         }
-        this.add(chain, target, !!meshBone);
-    };
-    // 3D THREE
-    Structure3D.prototype.addChainMeshs = function (chain) {
-        this.isWithMesh = true;
-        var meshBone = [];
-        var lng = chain.bones.length;
-        for (var i = 0; i < lng; i++) {
-            meshBone.push(this.addBoneMesh(chain.bones[i], i - 1, meshBone, chain));
-        }
-        this.meshChains.push(meshBone);
-    };
-    Structure3D.prototype.addBoneMesh = function (bone, prev, ar, chain) {
-        //const momimamu = new THREE.Mesh(
-        //	new THREE.CylinderBufferGeometry( 1, 0.5, size, 4 ),
-        //	new THREE.MeshStandardMaterial( { color: color, wireframe: false, shadowSide: DoubleSide } )
-        //);
-        //this.scene.add(momimamu);
-        var _a;
-        var size = bone.length;
-        var color = bone.color;
-        var g = new THREE.CylinderBufferGeometry(1, 0.5, size, 4);
-        g.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
-        g.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, size * 0.5));
-        var m = new THREE.MeshStandardMaterial({ color: color, wireframe: false, shadowSide: three_1.DoubleSide });
-        var m2 = new THREE.MeshBasicMaterial({ wireframe: true });
-        //var m4 = new THREE.MeshBasicMaterial({ wireframe : true, color:color, transparent:true, opacity:0.3 });
-        var extraMesh = null;
-        var extraGeo;
-        var type = bone.joint.type;
-        var axe;
-        var r = 2;
-        var a1 = bone.joint.min;
-        var a2 = bone.joint.max;
-        var s = 2; //size/4;
-        var angle;
-        switch (type) {
-            case constants_1.JointType.J_BALL:
-                m2.color.setHex(0xFF6600);
-                angle = bone.joint.rotor;
-                if (angle === Math.PI)
-                    break;
-                extraGeo = new THREE.CylinderBufferGeometry(0, r, s, 6, 1, true);
-                extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
-                extraGeo.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, s * 0.5));
-                extraMesh = new THREE.Mesh(extraGeo, m2);
-                break;
-            case constants_1.JointType.J_GLOBAL:
-                axe = bone.joint.getHingeRotationAxis();
-                //console.log( axe );
-                //console.log('global', a1, a2)
-                m2.color.setHex(0xFFFF00);
-                extraGeo = new THREE.CircleBufferGeometry(r, 12, a1, -a1 + a2);
-                //extraGeo.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI*0.5 ) );
-                if (axe.z === 1)
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
-                if (axe.y === 1) {
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI * 0.5));
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
-                }
-                if (axe.x === 1) {
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI * 0.5));
-                }
-                extraMesh = new THREE.Mesh(extraGeo, m2);
-                break;
-            case constants_1.JointType.J_LOCAL:
-                axe = bone.joint.getHingeRotationAxis();
-                //console.log('local', a1, a2)
-                m2.color.setHex(0x00FFFF);
-                extraGeo = new THREE.CircleBufferGeometry(r, 12, a1, -a1 + a2);
-                extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
-                if (axe.z === 1) {
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI * 0.5));
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI * 0.5));
-                }
-                if (axe.x === 1)
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationZ(-Math.PI * 0.5));
-                if (axe.y === 1) {
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI * 0.5));
-                    extraGeo.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI * 0.5));
-                }
-                extraMesh = new THREE.Mesh(extraGeo, m2);
-                break;
-        }
-        var axeThree = new THREE.AxesHelper(1.5);
-        //var bw = new THREE.Mesh( g,  m4 );
-        var b = new THREE.Mesh(g, m);
-        b.add(axeThree);
-        //b.add(bw);
-        (_a = this.scene) === null || _a === void 0 ? void 0 : _a.add(b);
-        b.castShadow = true;
-        b.receiveShadow = true;
-        if (prev !== -1) {
-            if (extraMesh !== null) {
-                if (type !== constants_1.JointType.J_GLOBAL) {
-                    extraMesh.position.z = chain.bones[prev].length;
-                    ar[prev].add(extraMesh);
-                }
-                else {
-                    b.add(extraMesh);
-                }
-            }
-        }
-        else {
-            if (extraMesh !== null)
-                b.add(extraMesh);
-        }
-        return b;
-    };
-    Structure3D.prototype.clearAllBoneMesh = function () {
-        var _a;
-        if (!this.isWithMesh)
-            return;
-        var i, j, b;
-        i = this.meshChains.length;
-        while (i--) {
-            j = this.meshChains[i].length;
-            while (j--) {
-                b = this.meshChains[i][j];
-                (_a = this.scene) === null || _a === void 0 ? void 0 : _a.remove(b);
-                b.geometry.dispose();
-                if (b.material instanceof THREE.Material) {
-                    b.material.dispose();
-                }
-                else {
-                    b.material.forEach(function (m) { return m.dispose(); });
-                }
-            }
-            this.meshChains[i] = [];
-        }
-        this.meshChains = [];
+        this.add(chain, target);
     };
     return Structure3D;
 }());

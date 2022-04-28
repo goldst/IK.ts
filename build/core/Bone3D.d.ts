@@ -8,12 +8,10 @@ export declare class Bone3D {
     end: V3;
     boneConnectionPoint: ConnectionType;
     length: number;
-    color: number;
     name: string;
-    constructor(startLocation: V3, endLocation?: V3, directionUV?: V3, length?: number, color?: number);
+    constructor(startLocation: V3, endLocation?: V3, directionUV?: V3, length?: number);
     init(startLocation: V3, endLocation?: V3, directionUV?: V3, length?: number): void;
     clone(): Bone3D;
-    setColor(c: number): void;
     setBoneConnectionPoint(bcp: ConnectionType): void;
     setHingeClockwise(angle: number): void;
     setHingeAnticlockwise(angle: number): void;

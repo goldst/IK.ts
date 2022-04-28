@@ -23,15 +23,14 @@ export declare class Chain2D {
     currentSolveDistance: number;
     connectedChainNumber: number;
     connectedBoneNumber: number;
-    color: number;
     embeddedTarget: V2;
     useEmbeddedTarget: boolean;
-    constructor(color?: number);
+    constructor();
     clone(): Chain2D;
     clear(): void;
     addBone(bone: Bone2D): void;
     removeBone(id: number): void;
-    addConsecutiveBone(directionUV: V2 | Bone2D, length: number, clockwiseDegs: number, anticlockwiseDegs: number, color?: number): void;
+    addConsecutiveBone(directionUV: V2 | Bone2D, length: number, clockwiseDegs: number, anticlockwiseDegs: number): void;
     getBoneConnectionPoint(): ConnectionType;
     getConnectedBoneNumber(): number;
     getConnectedChainNumber(): number;
@@ -42,7 +41,6 @@ export declare class Chain2D {
     getEffectorLocation(): V2;
     getLastTargetLocation(): V2;
     getLiveChainLength(): number;
-    setColor(color: number): void;
     setBaseboneRelativeConstraintUV(constraintUV?: V2): void;
     setConnectedBoneNumber(boneNumber: number): void;
     setConnectedChainNumber(chainNumber: number): void;

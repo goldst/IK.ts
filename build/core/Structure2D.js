@@ -2,24 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Structure2D = void 0;
 var constants_1 = require("../constants");
-var Math_1 = require("../math/Math");
 var Tools_1 = require("./Tools");
-var THREE = require("three");
 var Structure2D = /** @class */ (function () {
-    function Structure2D(scene) {
+    function Structure2D() {
         this.fixedBaseMode = true;
         this.chains = [];
-        this.meshChains = [];
         this.targets = [];
         this.numChains = 0;
-        this.scene = scene || null;
-        this.isWithMesh = false;
     }
     Structure2D.prototype.update = function () {
         //console.log('up')
         var _a;
-        var chain, mesh, bone, target;
-        var tmp = new THREE.Vector3();
+        var chain, target;
         var hostChainNumber;
         var constraintType;
         for (var i = 0; i < this.numChains; i++) {
@@ -59,15 +53,6 @@ var Structure2D = /** @class */ (function () {
                 chain.solveForTarget(target);
             else
                 console.log('embed', chain.solveForEmbeddedTarget());
-            // update 3d mesh
-            if (this.isWithMesh) {
-                mesh = this.meshChains[i];
-                for (var j = 0; j < chain.numBones; j++) {
-                    bone = chain.bones[j];
-                    mesh[j].position.set(bone.start.x, bone.start.y, 0);
-                    mesh[j].lookAt(tmp.set(bone.end.x, bone.end.y, 0));
-                }
-            }
         }
     };
     Structure2D.prototype.setFixedBaseMode = function (value) {
@@ -82,29 +67,24 @@ var Structure2D = /** @class */ (function () {
         //this.chains[0].setFixedBaseMode( this.fixedBaseMode );
     };
     Structure2D.prototype.clear = function () {
-        this.clearAllBoneMesh();
         var i;
         i = this.numChains;
         while (i--) {
             this.remove(i);
         }
         this.chains = [];
-        this.meshChains = [];
         this.targets = [];
     };
-    Structure2D.prototype.add = function (chain, target, meshBone) {
+    Structure2D.prototype.add = function (chain, target) {
         this.chains.push(chain);
         this.numChains++;
         //if( target.isVector3 ) target = new V2(target.x, target.y);
         if (target)
             this.targets.push(target);
-        if (meshBone)
-            this.addChainMeshs(chain);
     };
     Structure2D.prototype.remove = function (id) {
         this.chains[id].clear();
         this.chains.splice(id, 1);
-        this.meshChains.splice(id, 1);
         this.targets.splice(id, 1);
         this.numChains--;
     };
@@ -119,16 +99,16 @@ var Structure2D = /** @class */ (function () {
     Structure2D.prototype.getChain = function (id) {
         return this.chains[id];
     };
-    Structure2D.prototype.connectChain = function (Chain, chainNumber, boneNumber, point, target, meshBone) {
+    Structure2D.prototype.connectChain = function (Chain, chainNumber, boneNumber, point) {
         var c = chainNumber;
         var n = boneNumber;
         point = point || 'end';
         if (c > this.numChains) {
-            Tools_1.Tools.error('Chain not existe !');
+            Tools_1.Tools.error('Chain does not exist!');
             return;
         }
         if (n > this.chains[c].numBones) {
-            Tools_1.Tools.error('Bone not existe !');
+            Tools_1.Tools.error('Bone does not exist!');
             return;
         }
         // Make a copy of the provided chain so any changes made to the original do not affect this chain
@@ -151,93 +131,6 @@ var Structure2D = /** @class */ (function () {
             chain.bones[i].start.add(position);
             chain.bones[i].end.add(position);
         }
-        this.add(chain, target, !!meshBone);
-    };
-    // 3D THREE
-    Structure2D.prototype.addChainMeshs = function (chain) {
-        this.isWithMesh = true;
-        var meshBone = [];
-        var lng = chain.bones.length;
-        for (var i = 0; i < lng; i++) {
-            meshBone.push(this.addBoneMesh(chain.bones[i]));
-        }
-        this.meshChains.push(meshBone);
-    };
-    Structure2D.prototype.addBoneMesh = function (bone) {
-        var size = bone.length;
-        var color = bone.color;
-        //console.log(bone.color)
-        var g = new THREE.CylinderBufferGeometry(1, 0.5, size, 4);
-        //g.applyMatrix4( new THREE.Matrix4().makeTranslation( 0, size*0.5, 0 ) );
-        g.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math_1._Math.pi90));
-        g.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, size * 0.5));
-        //var m = new THREE.MeshStandardMaterial({ color:color });
-        var m = new THREE.MeshStandardMaterial({ color: color, wireframe: false });
-        //m.color.setHex( color );
-        var extraMesh;
-        //let extraGeo;
-        /*var type = bone.getJoint().type;
-        switch(type){
-            case J_BALL :
-                m2.color.setHex(0xFF6600);
-                var angle  = bone.getJoint().mRotorConstraintDegs;
-                if(angle === 180) break;
-                var s = size/4;
-                var r = 2;//
-
-                extraGeo = new THREE.CylinderBufferGeometry ( 0, r, s, 6 );
-                extraGeo.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI*0.5 ) )
-                extraGeo.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, s*0.5 ) );
-                extraMesh = new THREE.Mesh( extraGeo,  m2 );
-            break;
-            case J_GLOBAL_HINGE :
-            var a1 = bone.getJoint().mHingeClockwiseConstraintDegs * _Math.torad;
-            var a2 = bone.getJoint().mHingeAnticlockwiseConstraintDegs * _Math.torad;
-            var r = 2;
-            m2.color.setHex(0xFFFF00);
-            extraGeo = new THREE.CircleGeometry ( r, 12, a1, a1+a2 );
-            extraGeo.applyMatrix4( new THREE.Matrix4().makeRotationX( -Math.PI*0.5 ) );
-            extraMesh = new THREE.Mesh( extraGeo,  m2 );
-            break;
-            case J_LOCAL_HINGE :
-            var r = 2;
-            var a1 = bone.getJoint().mHingeClockwiseConstraintDegs * _Math.torad;
-            var a2 = bone.getJoint().mHingeAnticlockwiseConstraintDegs * _Math.torad;
-            m2.color.setHex(0x00FFFF);
-            extraGeo = new THREE.CircleGeometry ( r, 12, a1, a1+a2 );
-            extraGeo.applyMatrix4( new THREE.Matrix4().makeRotationX( -Math.PI*0.5 ) );
-            extraMesh = new THREE.Mesh( extraGeo,  m2 );
-            break;
-        }*/
-        var b = new THREE.Mesh(g, m);
-        b.castShadow = true;
-        b.receiveShadow = true;
-        this.scene.add(b);
-        if (extraMesh)
-            b.add(extraMesh);
-        return b;
-    };
-    Structure2D.prototype.clearAllBoneMesh = function () {
-        if (!this.isWithMesh)
-            return;
-        var i, j, b;
-        i = this.meshChains.length;
-        while (i--) {
-            j = this.meshChains[i].length;
-            while (j--) {
-                b = this.meshChains[i][j];
-                this.scene.remove(b);
-                b.geometry.dispose();
-                if (b.material instanceof THREE.Material) {
-                    b.material.dispose();
-                }
-                else {
-                    b.material.forEach(function (m) { return m.dispose(); });
-                }
-            }
-            this.meshChains[i] = [];
-        }
-        this.meshChains = [];
     };
     Structure2D.isStructure2D = true;
     return Structure2D;
