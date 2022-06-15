@@ -159,7 +159,7 @@ export class Chain2D implements Chain<Bone2D, V2, Joint2D, BaseboneConstraintTyp
 
     }
 
-    addConsecutiveBone( directionUV: V2 | Bone2D, length: number, clockwiseDegs: number, anticlockwiseDegs: number ) {
+    addConsecutiveBone( directionUV: V2 | Bone2D, length: number, clockwiseDegs?: number, anticlockwiseDegs?: number ) {
 
         if ( this.numBones === 0 ) {
 
@@ -481,7 +481,7 @@ export class Chain2D implements Chain<Bone2D, V2, Joint2D, BaseboneConstraintTyp
     // -------------------------------
 
     // Solve the IK chain for the given target using the FABRIK algorithm.
-    // retun the best solve distance found between the end-effector of this chain and the provided target.
+    // return the best solve distance found between the end-effector of this chain and the provided target.
 
     solveIK( target: V2 ) {
 
